@@ -43,6 +43,7 @@ def update_text(new_text):
     st.write("Changes accepted.")
     st.session_state['essay'] = new_text
     st.session_state['devil_button'] = False
+    st.session_state['grammar'] = False
 
 def reject_changes():
     st.write("Changes rejected.")
@@ -71,6 +72,7 @@ def main():
     devil_advocate = st.button("Devil's Advocate")
     fact_check = st.button("Fact Check")
     assistant = st.button("Assistant")
+    grammar = st.button("Fix Grammar")
     # Create a sidebar
     sidebar = st.sidebar.empty()
     
@@ -100,6 +102,27 @@ def main():
             st.session_state.accept_changes = st.button("Accept changes", on_click=update_text, args=(fixed_text,))
             st.session_state.reject_changes = st.button("Reject changes", on_click=reject_changes, args=())
 
+        
+    if st.session_state.get('grammar') != True:
+        st.session_state['grammar'] = grammar
+
+    if st.session_state.grammar == True:
+        st.session_state['assistant_button'] = False
+        st.session_state['devil_button'] = False
+        with st.spinner("Loading..."):
+            # Send a GET request to localhost:8000/devil
+            grammar_response = requests.get("http://localhost:8000/grammar", json={"text": essay})
+            fixed_text = grammar_response.json()["text"]
+
+            st.header("Suggested Changes")
+            diff = show_diffs(essay, fixed_text)
+            st.markdown(diff)
+
+            #Create accept and reject changes buttons in the sidebar
+
+            st.session_state.accept_changes = st.button("Accept changes", on_click=update_text, args=(fixed_text,))
+            st.session_state.reject_changes = st.button("Reject changes", on_click=reject_changes, args=())
+
 
     elif fact_check:
         with st.spinner("Loading..."):
@@ -116,6 +139,7 @@ def main():
 
     if st.session_state.assistant_button == True:
         st.session_state['devil_button'] = False
+        st.session_state['grammar'] = False 
         if "user_input" not in st.session_state:
             st.session_state['user_input'] = ""
         if "assistant_answer" not in st.session_state:

@@ -1,5 +1,5 @@
 import os
-from backend import devil_advocate, fact_check, assisstant
+from backend import devil_advocate, fact_check, assisstant, grammar
 from fastapi import FastAPI
 from pydantic import BaseModel
 import uvicorn
@@ -8,6 +8,7 @@ app = FastAPI()
 devil = devil_advocate.Devil()
 factChecker = fact_check.FactChecker()
 assisstant = assisstant.Assisstant()
+grammar = grammar.Grammar()
 
 class TextProcessor(BaseModel):
     text: str
@@ -40,6 +41,10 @@ def query(textQuery: TextQuery):
     with open("tmp/essay.txt", "w") as f:
         f.write(textQuery.text)
     return {"text": '🤖 '+assisstant.help('tmp/essay.txt', textQuery.query)+' 🤖'}
+
+@app.get("/grammar")
+def check(textProcessor: TextProcessor):
+    return {"text": grammar.fix(textProcessor.text)}
 
 if __name__ == "__main__":
     uvicorn.run("app:app", host="0.0.0.0", port=8000, reload=True, reload_excludes='frontend/*')
