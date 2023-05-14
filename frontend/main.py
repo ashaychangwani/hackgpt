@@ -120,6 +120,8 @@ def main():
 
     if st.session_state.devil_button == True:
         st.session_state['assistant_button'] = False
+        st.session_state['tone_button'] = False
+        st.session_state['beautify'] = False
         with st.spinner("Loading..."):
             # Send a GET request to localhost:8000/devil
             devil_response = requests.get("http://localhost:8000/devil", json={"text": essay})
@@ -145,6 +147,9 @@ def main():
         st.session_state['tone_button'] = tone
     
     if st.session_state.tone_button == True:
+        st.session_state['assistant_button'] = False
+        st.session_state['devil_button'] = False
+        st.session_state['beautify'] = False
         desired_tone = st.text_input("Desired tone:")
         if desired_tone:
             with st.spinner("Loading..."):
@@ -168,6 +173,8 @@ def main():
     if st.session_state.grammar == True:
         st.session_state['assistant_button'] = False
         st.session_state['devil_button'] = False
+        st.session_state['beautify'] = False
+        st.session_state['tone_button'] = False
         with st.spinner("Loading..."):
             # Send a GET request to localhost:8000/devil
             grammar_response = requests.get("http://localhost:8000/grammar", json={"text": essay})
@@ -201,7 +208,7 @@ def main():
             except Exception as e:
                 st.error(f"Error: {e}")
 
-    elif fact_check:
+    if fact_check:
         with st.spinner("Loading..."):
             # Send a GET request to localhost:8000/fact_check
             fact_check_response = requests.get("http://localhost:8000/fact-check", json={"text": essay},timeout=120)
@@ -215,8 +222,10 @@ def main():
         st.session_state['assistant_button'] = assistant
 
     if st.session_state.assistant_button == True:
+        st.session_state['grammar'] = False
         st.session_state['devil_button'] = False
-        st.session_state['grammar'] = False 
+        st.session_state['beautify'] = False
+        st.session_state['tone_button'] = False
         if "user_input" not in st.session_state:
             st.session_state['user_input'] = ""
         if "assistant_answer" not in st.session_state:
