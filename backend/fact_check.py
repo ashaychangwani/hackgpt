@@ -1,5 +1,5 @@
 from langchain.chains import LLMSummarizationCheckerChain
-from langchain.chat_models import ChatOpenAI
+from langchain.chat_models import PromptLayerChatOpenAI
 import os
 from langchain.agents import initialize_agent
 from langchain.agents import AgentType
@@ -12,7 +12,7 @@ import contextlib
 class FactChecker:
     def __init__(self):
         x=3
-        llm = ChatOpenAI(temperature=0.7, model_name = 'gpt-3.5-turbo', openai_api_key=os.getenv("OPENAI_API_KEY"))
+        llm = PromptLayerChatOpenAI(temperature=0.7, model_name = 'gpt-3.5-turbo', openai_api_key=os.getenv("OPENAI_API_KEY"))
         tools = load_tools(["serpapi", "llm-math"], llm=llm, serpapi_api_key=os.getenv("SERPAPI_API_KEY"))
         self.agent = initialize_agent(tools, llm, agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION, verbose=True)
         self.prompt_factcheck = f"""
