@@ -28,7 +28,7 @@ def critique(textProcessor: TextProcessor):
 
 @app.get("/fix")
 def fix(textFixer: TextFixer):
-    return {"text": '😇 '+devil.fix(textFixer.text, textFixer.critique)+' 😇'} 
+    return {"text": devil.fix(textFixer.text, textFixer.critique)} 
 
 @app.get("/fact-check")
 def check(textProcessor: TextProcessor):
@@ -42,4 +42,4 @@ def query(textQuery: TextQuery):
     return {"text": '🤖 '+assisstant.help('tmp/essay.txt', textQuery.query)+' 🤖'}
 
 if __name__ == "__main__":
-    uvicorn.run("app:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("app:app", host="0.0.0.0", port=8000, reload=True, reload_excludes='frontend/*')

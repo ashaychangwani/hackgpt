@@ -52,6 +52,6 @@ class Devil:
         return response
 
     def fix (self, text, critique):
-        print(self.fix_prompt.format_prompt(text=text, critique=critique).to_messages())
         response = self.chat(self.fix_prompt.format_prompt(text=text, critique=critique).to_messages()).content
+        response = response.replace("Revised Essay:", "").strip()
         return response
