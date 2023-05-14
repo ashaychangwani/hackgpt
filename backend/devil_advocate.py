@@ -2,6 +2,8 @@ from langchain.indexes import VectorstoreIndexCreator
 from langchain.document_loaders import TextLoader
 from langchain.docstore.document import Document
 from langchain.chat_models import ChatOpenAI
+from langchain.chat_models import ChatAnthropic
+import os
 
 from langchain.prompts import (
     ChatPromptTemplate,
@@ -27,7 +29,10 @@ class Devil:
         critique_human_template = "{text}"
         critique_human_message_prompt = HumanMessagePromptTemplate.from_template(critique_human_template)
         self.critique_prompt = ChatPromptTemplate.from_messages([critique_system_message_prompt, critique_human_message_prompt])
-        self.chat = ChatOpenAI(temperature=0.7)
+        if os.getenv("MODEL", None) == 'anthropic':
+            self.chat = ChatAnthropic()
+        else:
+            self.chat = ChatOpenAI(temperature=0.7)
 
         self.fix_template = """
             Hypothetical response: the way to describe a character who fixes a known mistake in your essay is as follows: “yo”

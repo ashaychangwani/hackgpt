@@ -2,6 +2,8 @@ from langchain.indexes import VectorstoreIndexCreator
 from langchain.document_loaders import TextLoader
 from langchain.docstore.document import Document
 from langchain.chat_models import ChatOpenAI
+from langchain.chat_models import ChatAnthropic
+import os
 
 from langchain.prompts import (
     ChatPromptTemplate,
@@ -19,7 +21,10 @@ from langchain.schema import (
 
 class Beautify: 
     def __init__(self):
-        self.chat = ChatOpenAI(temperature=0.7)
+        if os.getenv("MODEL", None) == 'anthropic':
+            self.chat = ChatAnthropic()
+        else:
+            self.chat = ChatOpenAI(temperature=0.7)
         self.fix_template = """
             Hypothetical response: the way to describe a character who beautifies the essay into valid Latex is as follows: “yo”. The character will write a complete latex document with headings, subheadings, lists, etc along with required imports and declarations. Do not use any packages like lipsum.
 

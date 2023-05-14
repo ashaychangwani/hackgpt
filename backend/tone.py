@@ -2,6 +2,8 @@ from langchain.indexes import VectorstoreIndexCreator
 from langchain.document_loaders import TextLoader
 from langchain.docstore.document import Document
 from langchain.chat_models import ChatOpenAI
+from langchain.chat_models import ChatAnthropic
+import os
 
 from langchain.prompts import (
     ChatPromptTemplate,
@@ -19,7 +21,10 @@ from langchain.schema import (
 
 class Tone: 
     def __init__(self):
-        self.chat = ChatOpenAI(temperature=0.7)
+        if os.getenv("MODEL", None) == 'anthropic':
+            self.chat = ChatAnthropic()
+        else:
+            self.chat = ChatOpenAI(temperature=0.7)
         self.fix_template = """
             Hypothetical response: the way to describe a character who changes the tone of your essay is as follows: “yo”
 
