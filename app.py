@@ -1,5 +1,5 @@
 import os
-from backend import devil_advocate, fact_check, assisstant, grammar, tone
+from backend import devil_advocate, fact_check, assisstant, grammar, tone, beautify
 from fastapi import FastAPI
 from pydantic import BaseModel
 import uvicorn
@@ -10,6 +10,7 @@ factChecker = fact_check.FactChecker()
 assisstant = assisstant.Assisstant()
 grammar = grammar.Grammar()
 tone = tone.Tone()
+beautify = beautify.Beautify()
 
 class TextProcessor(BaseModel):
     text: str
@@ -50,6 +51,10 @@ def check(textProcessor: TextProcessor):
 @app.get("/tone")
 def check(textFixer: TextFixer):
     return {"text": tone.fix(textFixer.text, textFixer.critique)}
+    
+@app.get("/beautify")
+def check(textFixer: TextProcessor):
+    return {"text": beautify.fix(textFixer.text)}
     
 if __name__ == "__main__":
     uvicorn.run("app:app", host="0.0.0.0", port=8000, reload=True, reload_excludes='frontend/*')

@@ -5,6 +5,9 @@ import difflib
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
 import os
+import tempfile
+from subprocess import run
+
 
 
 # Function to show differences between original and fixed text
@@ -50,6 +53,30 @@ def reject_changes():
     st.write("Changes rejected.")
     st.session_state['devil_button'] = False
 
+def get_latex_code(essay):
+    response = requests.get("http://localhost:8000/beautify", json={"text": essay})
+    if response.status_code == 200:
+        return json.loads(response.text)["text"]
+    else:
+        print(f"Request failed with status code {response.status_code}")
+
+def latex_to_pdf(latex_code, pdf_path):
+    with tempfile.TemporaryDirectory() as temp_dir:
+        tex_path = os.path.join(temp_dir, "temp.tex")
+        with open(tex_path, "w") as tex_file:
+            tex_file.write(latex_code)
+        print(tex_path)
+        process = run(
+            ["/Library/TeX/texbin/pdflatex", "-output-directory", temp_dir, tex_path],
+            capture_output=True,
+            text=True,
+        )
+
+        if process.returncode == 0:
+            os.rename(os.path.join(temp_dir, "temp.pdf"), pdf_path)
+        else:
+            raise Exception("PDF conversion failed")
+
 class CodeChangeHandler(FileSystemEventHandler):
     def on_modified(self, event):
         # Re-run the Streamlit app when a code change is detected
@@ -63,18 +90,28 @@ def main():
         st.session_state['accept_changes'] = None
     if "reject_changes" not in st.session_state:
         st.session_state['reject_changes'] = None
-
+    if "save_button" not in st.session_state:
+        st.session_state['save_button'] = None
     st.title("Essay Assistant")
     
     # Create a large text area for the essay
     essay = st.text_area("Enter your essay here:", height=600, key="essay")
 
     # Create three buttons
-    devil_advocate = st.button("Devil's Advocate")
-    fact_check = st.button("Fact Check")
-    assistant = st.button("Assistant")
-    grammar = st.button("Fix Grammar")
-    tone = st.button("Tone Analysis")
+    col1, col2, col3 = st.columns([1,1,1])
+    col4, col5, col6 = st.columns([1,1,1])
+    with col1:
+        devil_advocate = st.button("Devil's Advocate")
+    with col2: 
+        fact_check = st.button("Fact Check")
+    with col3: 
+        assistant = st.button("Assistant")
+    with col4:
+        grammar = st.button("Fix Grammar")
+    with col5:
+        tone = st.button("Tone Analysis")
+    with col6: 
+        beautify = st.button("Beautify")
     # Create a sidebar
     sidebar = st.sidebar.empty()
     
@@ -145,6 +182,24 @@ def main():
             st.session_state.accept_changes = st.button("Accept changes", on_click=update_text, args=(fixed_text,))
             st.session_state.reject_changes = st.button("Reject changes", on_click=reject_changes, args=())
 
+    if st.session_state.get('beautify') != True:
+        st.session_state['beautify'] = beautify
+        
+    if st.session_state.beautify == True:
+        with st.spinner("Loading..."):
+            latex_code = get_latex_code(essay)
+            pdf_path = "latex_code.pdf"
+            try:
+                latex_to_pdf(latex_code, pdf_path)
+                st.success(f"PDF created: {pdf_path}")
+                st.download_button(
+                    label="Download PDF",
+                    data=pdf_path,
+                    file_name='latex_code.pdf',
+                    mime='application/octet-stream',
+                )
+            except Exception as e:
+                st.error(f"Error: {e}")
 
     elif fact_check:
         with st.spinner("Loading..."):
