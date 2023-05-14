@@ -92,7 +92,7 @@ def main():
         st.session_state['reject_changes'] = None
     if "save_button" not in st.session_state:
         st.session_state['save_button'] = None
-    st.title("Essay Assistant")
+    st.title("TWERP (Text Writing Enhancement & Revision Prodigy)")
     
     # Create a large text area for the essay
     essay = st.text_area("Enter your essay here:", height=400, key="essay")
