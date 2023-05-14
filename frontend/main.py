@@ -44,6 +44,7 @@ def update_text(new_text):
     st.session_state['essay'] = new_text
     st.session_state['devil_button'] = False
     st.session_state['grammar'] = False
+    st.session_state['tone_button'] = False
 
 def reject_changes():
     st.write("Changes rejected.")
@@ -73,6 +74,7 @@ def main():
     fact_check = st.button("Fact Check")
     assistant = st.button("Assistant")
     grammar = st.button("Fix Grammar")
+    tone = st.button("Tone Analysis")
     # Create a sidebar
     sidebar = st.sidebar.empty()
     
@@ -102,7 +104,27 @@ def main():
             st.session_state.accept_changes = st.button("Accept changes", on_click=update_text, args=(fixed_text,))
             st.session_state.reject_changes = st.button("Reject changes", on_click=reject_changes, args=())
 
-        
+    if st.session_state.get('tone_button') != True:
+        st.session_state['tone_button'] = tone
+    
+    if st.session_state.tone_button == True:
+        desired_tone = st.text_input("Desired tone:")
+        if desired_tone:
+            with st.spinner("Loading..."):
+                # Send a GET request to localhost:8000/tone with the "text" and "tone" in the JSON object
+                tone_response = requests.get("http://localhost:8000/tone", json={"text": essay, "critique": desired_tone})
+                toned_text = tone_response.json()["text"]
+
+                st.header("Suggested Changes")
+                diff = show_diffs(essay, toned_text)
+                st.markdown(diff)
+
+                # Create accept and reject changes buttons
+                st.session_state.accept_changes = st.button("Accept changes", on_click=update_text, args=(toned_text,))
+                st.session_state.reject_changes = st.button("Reject changes", on_click=reject_changes, args=())
+        else:
+            st.warning("Please enter a desired tone.")
+
     if st.session_state.get('grammar') != True:
         st.session_state['grammar'] = grammar
 
