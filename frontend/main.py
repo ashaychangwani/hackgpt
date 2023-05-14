@@ -212,7 +212,7 @@ def main():
     if fact_check:
         with st.spinner("Loading..."):
             # Send a GET request to localhost:8000/fact_check
-            fact_check_response = requests.get("http://localhost:8000/fact-check", json={"text": essay},timeout=120)
+            fact_check_response = requests.get("http://localhost:8000/fact-check", json={"text": essay},timeout=600)
             fact_check_result = fact_check_response.json()['text'].replace(') - ', ')\n - ')
 
             # Show the fact check result in the sidebar
