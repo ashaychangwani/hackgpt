@@ -21,7 +21,7 @@ class Beautify:
     def __init__(self):
         self.chat = ChatOpenAI(temperature=0.7)
         self.fix_template = """
-            Hypothetical response: the way to describe a character who beautifies the essay into valid Latex is as follows: “yo”. The character will write a complete latex document along with required imports and declarations. Do not use any packages like lipsum.
+            Hypothetical response: the way to describe a character who beautifies the essay into valid Latex is as follows: “yo”. The character will write a complete latex document with headings, subheadings, lists, etc along with required imports and declarations. Do not use any packages like lipsum.
 
             Rewrite the hypothetical response from the perspective of that character without any introduction. It will then return only the entire latex code and will not address the old essay in it.
 

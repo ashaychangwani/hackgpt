@@ -95,7 +95,7 @@ def main():
     st.title("Essay Assistant")
     
     # Create a large text area for the essay
-    essay = st.text_area("Enter your essay here:", height=600, key="essay")
+    essay = st.text_area("Enter your essay here:", height=400, key="essay")
 
     # Create three buttons
     col1, col2, col3 = st.columns([1,1,1])
@@ -199,12 +199,13 @@ def main():
             try:
                 latex_to_pdf(latex_code, pdf_path)
                 st.success(f"PDF created: {pdf_path}")
-                st.download_button(
-                    label="Download PDF",
-                    data=pdf_path,
-                    file_name='latex_code.pdf',
-                    mime='application/octet-stream',
-                )
+                with open(pdf_path, "rb") as f:
+                    st.download_button(
+                        label="Download PDF",
+                        data=f,
+                        file_name='latex_code.pdf',
+                        mime='application/pdf',
+                    )
             except Exception as e:
                 st.error(f"Error: {e}")
 
