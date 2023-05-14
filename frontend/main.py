@@ -44,7 +44,9 @@ def update_text(new_text):
     st.session_state['essay'] = new_text
     st.session_state['devil_button'] = False
 
-
+def reject_changes():
+    st.write("Changes rejected.")
+    st.session_state['devil_button'] = False
 
 class CodeChangeHandler(FileSystemEventHandler):
     def on_modified(self, event):
@@ -96,14 +98,14 @@ def main():
             #Create accept and reject changes buttons in the sidebar
 
             st.session_state.accept_changes = st.button("Accept changes", on_click=update_text, args=(fixed_text,))
-            st.session_state.reject_changes = st.button("Reject changes", on_click=st.write, args=("Changes rejected.",))
+            st.session_state.reject_changes = st.button("Reject changes", on_click=reject_changes, args=())
 
 
     elif fact_check:
         with st.spinner("Loading..."):
             # Send a GET request to localhost:8000/fact_check
-            fact_check_response = requests.get("http://localhost:8000/fact_check", json={"text": essay})
-            fact_check_result = fact_check_response.json()
+            fact_check_response = requests.get("http://localhost:8000/fact-check", json={"text": essay},timeout=120)
+            fact_check_result = fact_check_response.json()['text'].replace(') - ', ')\n - ')
 
             # Show the fact check result in the sidebar
             sidebar.header("Fact Check")
