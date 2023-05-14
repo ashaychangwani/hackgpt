@@ -21,7 +21,8 @@ class FactChecker:
 
         Perform the fact check by listing down the "factual" statements that the article author claim to be true into bullet points, and present this points.
         Then for each point, find out whether they are true by cross checking with other websites.
-        Finally, present the end result by giving a verdict for each point whether they are true or not, and also present the website used for the cross check.
+        Finally, present the end result as a list in this format:
+        - <Statement> : <Verdict> (Source)
         """
         self.compressor = CohereRerank()
 
